@@ -1,0 +1,5 @@
+mod 'r_gito',
+  :git => 'https://h0tbird@github.com/h0tbird/puppet-r_gito.git'
+
+mod 'gitolite',
+  :git => 'https://h0tbird@github.com/h0tbird/puppet-gitolite.git'
