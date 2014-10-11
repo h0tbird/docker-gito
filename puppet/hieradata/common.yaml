@@ -22,6 +22,6 @@ r_gito::cgit:
 
 r_gito::apache:
   default_mods: true
-  default_conf_files: true
+  default_confd_files: true
 
 ...
