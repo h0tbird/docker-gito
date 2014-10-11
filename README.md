@@ -1,4 +1,4 @@
-docker-gitolite
-===============
+docker-gito
+===========
 
-Containerized gitolite server
+Containerized git server
