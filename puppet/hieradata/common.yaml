@@ -20,4 +20,8 @@ r_gito::cgit:
   version: 'latest'
   git_home: '/home/git'
 
+r_gito::apache:
+  default_mods: true
+  default_conf_files: true
+
 ...
