@@ -3,3 +3,9 @@ mod 'r_gito',
 
 mod 'gitolite',
   :git => 'https://h0tbird@github.com/h0tbird/puppet-gitolite.git'
+
+mod 'cgit',
+  :git => 'https://h0tbird@github.com/h0tbird/puppet-cgit.git'
+
+mod 'apache',
+  :git => 'https://github.com/puppetlabs/puppetlabs-apache.git'
