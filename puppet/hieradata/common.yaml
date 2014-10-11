@@ -7,4 +7,7 @@
 r_gito::gitolite:
  version: 'latest'
 
+r_gito::cgit:
+  version: 'latest'
+
 ...
