@@ -21,7 +21,9 @@ r_gito::cgit:
   git_home: '/home/git'
 
 r_gito::apache:
-  default_mods: false
+  default_mods:
+    - 'autoindex'
+    - 'cgi'
   default_confd_files: false
   purge_configs: false
 
