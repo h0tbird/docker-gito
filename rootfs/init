@@ -1,0 +1,69 @@
+#!/bin/bash
+
+#------------------------------------------------------------------------------
+# Wait for the network:
+#------------------------------------------------------------------------------
+
+[ "$WAIT_IFACE" ] && {
+
+  RETRIES=20
+
+  echo "[Init] Waiting for ${WAIT_IFACE} network..."
+
+  while [ $RETRIES -gt 0 ]; do
+    ip -o a | grep -q $WAIT_IFACE && break
+    sleep 1; RETRIES=$((RETRIES - 1))
+  done
+
+  [ $RETRIES -eq 0 ] && {
+    echo "[Init] There is no ${WAIT_IFACE} network"
+    exit 1
+  }
+
+  echo "[Init] Interface ${WAIT_IFACE} is present"
+}
+
+#------------------------------------------------------------------------------
+# Configure the service:
+#------------------------------------------------------------------------------
+
+echo '[Init] Configuring the service...'
+
+[ -f /etc/ssh/ssh_host_rsa_key ] || {
+  ssh-keygen -q -f /etc/ssh/ssh_host_rsa_key -t rsa -N ''
+}
+
+[ -f /etc/ssh/ssh_host_ecdsa_key ] || {
+  ssh-keygen -q -f /etc/ssh/ssh_host_ecdsa_key -t ecdsa -N ''
+}
+
+cd /home/git && [ -d ./repositories ] && {
+
+  chown -R git:git repositories
+
+  [ -d ./repositories/gitolite-admin.git ] && {
+    mv ./repositories/gitolite-admin.git ./repositories/gitolite-admin.git-tmp
+  }
+
+  su git -c 'gitolite setup -a dummy' &> /dev/null
+
+  [ -d ./repositories/gitolite-admin.git-tmp ] && {
+    rm -rf ./repositories/gitolite-admin.git
+    mv ./repositories/gitolite-admin.git-tmp ./repositories/gitolite-admin.git
+  }
+
+  su git -c "cd ~/repositories/gitolite-admin.git && \
+  GL_LIBDIR=/usr/share/gitolite3/lib hooks/post-update refs/heads/master"
+
+} || {
+
+  echo '[Init] You must provide a repositories volume'
+  exit 1
+}
+
+#------------------------------------------------------------------------------
+# Run:
+#------------------------------------------------------------------------------
+
+echo "[Init] Executing: $*"
+exec $*

@@ -2,23 +2,27 @@
 # Set the base image for subsequent instructions:
 #------------------------------------------------------------------------------
 
-FROM h0tbird/base
+FROM centos
 MAINTAINER Marc Villacorta Morera <marc.villacorta@gmail.com>
 
 #------------------------------------------------------------------------------
-# Get the puppet modules and apply the manifest:
+# Update the base image:
 #------------------------------------------------------------------------------
 
-ADD puppet /etc/puppet
-
-RUN cd /etc/puppet/environments/production && \
-    r10k puppetfile install && \
-    FACTER_docker_build=true \
-    FACTER_fqdn=gito00.demo.lan \
-    puppet apply /etc/puppet/environments/production/manifests/site.pp
+RUN yum update -y
 
 #------------------------------------------------------------------------------
-# Expose ports and set systemd as default process:
+# Install:
 #------------------------------------------------------------------------------
 
-CMD ["/usr/sbin/init"]
+RUN rpm --import http://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7
+RUN yum install -y epel-release
+RUN yum install -y gitolite3 hostname openssh-server
+RUN adduser -m -G gitolite3 git
+ADD rootfs /
+
+#------------------------------------------------------------------------------
+# Set systemd as default process:
+#------------------------------------------------------------------------------
+
+ENTRYPOINT ["/init", "/usr/sbin/sshd", "-D"]
