@@ -25,7 +25,7 @@ ADD rootfs /
 # Shared data:
 #------------------------------------------------------------------------------
 
-VOLUME /home/git/projects.list
+VOLUME /home/git/projects
 VOLUME /home/git/repositories
 
 #------------------------------------------------------------------------------

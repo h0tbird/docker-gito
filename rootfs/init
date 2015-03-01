@@ -39,7 +39,7 @@ echo '[Init] Configuring the service...'
 
 cd /home/git && [ -d ./repositories ] && {
 
-  chown -R git:git repositories
+  chown -R git:git /home/git
 
   [ -d ./repositories/gitolite-admin.git ] && {
     mv ./repositories/gitolite-admin.git ./repositories/gitolite-admin.git-tmp
@@ -51,6 +51,10 @@ cd /home/git && [ -d ./repositories ] && {
     rm -rf ./repositories/gitolite-admin.git
     mv ./repositories/gitolite-admin.git-tmp ./repositories/gitolite-admin.git
   }
+
+  sed -i \
+  '/%RC/a\    GITWEB_PROJECTS_LIST => "$ENV{HOME}/projects/projects.list",' \
+  .gitolite.rc && rm projects.list
 
   su git -c "cd ~/repositories/gitolite-admin.git && \
   GL_LIBDIR=/usr/share/gitolite3/lib hooks/post-update refs/heads/master"
