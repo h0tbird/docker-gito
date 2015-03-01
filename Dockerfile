@@ -22,7 +22,7 @@ RUN adduser -m -G gitolite3 git
 ADD rootfs /
 
 #------------------------------------------------------------------------------
-# Set systemd as default process:
+# Entrypoint:
 #------------------------------------------------------------------------------
 
 ENTRYPOINT ["/init", "/usr/sbin/sshd", "-D"]

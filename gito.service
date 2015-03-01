@@ -22,7 +22,7 @@ ExecStartPre=-/usr/sbin/docker pull h0tbird/gito:latest
 #----------------------
 
 ExecStart=/usr/bin/sh -c "docker run -t \
-  --volume   /data/gito/git_repos:/home/git/repositories \
+  --volume   /data/gito/repos:/home/git/repositories \
   --hostname gito01.demo.lan \
   --name     gito01 \
   --net      none \
