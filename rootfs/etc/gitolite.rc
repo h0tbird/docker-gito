@@ -1,0 +1,30 @@
+%RC = (
+
+    UMASK                => 0022,
+    GIT_CONFIG_KEYS      => 'gitweb\.(owner|description|category)',
+    GITWEB_PROJECTS_LIST => "$ENV{HOME}/projects/projects.list",
+    LOG_EXTRA            => 1,
+
+    ROLES => {
+        READERS => 1,
+        WRITERS => 1,
+    },
+
+    LOCAL_CODE => "$rc{GL_ADMIN_BASE}/local",
+
+    ENABLE => [
+        'help',
+        'desc',
+        'info',
+        'perms',
+        'writable',
+        'ssh-authkeys',
+        'git-config',
+        'daemon',
+        'gitweb',
+        'cgit',
+        'repo-specific-hooks',
+    ],
+);
+
+1;

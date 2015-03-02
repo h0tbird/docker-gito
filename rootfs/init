@@ -37,29 +37,31 @@ echo '[Init] Configuring the service...'
   ssh-keygen -q -f /etc/ssh/ssh_host_ecdsa_key -t ecdsa -N ''
 }
 
-cd /home/git && [ -d ./repositories ] && {
+chown -R git:git /home/git
 
-  chown -R git:git /home/git
+cd /home/git && [ -d ./repositories ] && su git -c "
 
   [ -d ./repositories/gitolite-admin.git ] && {
     mv ./repositories/gitolite-admin.git ./repositories/gitolite-admin.git-tmp
   }
 
-  su git -c 'gitolite setup -a dummy' &> /dev/null
+  gitolite setup -a dummy &> /dev/null
 
   [ -d ./repositories/gitolite-admin.git-tmp ] && {
     rm -rf ./repositories/gitolite-admin.git
     mv ./repositories/gitolite-admin.git-tmp ./repositories/gitolite-admin.git
   }
 
-  sed -i \
-  '/%RC/a\    GITWEB_PROJECTS_LIST => "$ENV{HOME}/projects/projects.list",' \
-  .gitolite.rc && rm projects.list
+  [ -d .gitolite/local/hooks/repo-specific ] || {
+    mkdir -p .gitolite/local/hooks/repo-specific
+    chmod 700 .gitolite/local/hooks/repo-specific
+  }
 
-  su git -c "cd ~/repositories/gitolite-admin.git && \
-  GL_LIBDIR=/usr/share/gitolite3/lib hooks/post-update refs/heads/master"
+  cp /etc/gitolite.rc .gitolite.rc && rm projects.list
+  cd ~/repositories/gitolite-admin.git && \
+  GL_LIBDIR=/usr/share/gitolite3/lib hooks/post-update refs/heads/master
 
-} || {
+" || {
 
   echo '[Init] You must provide a repositories volume'
   exit 1
