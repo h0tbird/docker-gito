@@ -1,7 +1,7 @@
 %RC = (
 
     UMASK                => 0022,
-    GIT_CONFIG_KEYS      => 'gitweb\.(owner|description|category)',
+    GIT_CONFIG_KEYS      => 'gitweb\.(owner|description|category) gitolite\.mirror\..*',
     GITWEB_PROJECTS_LIST => "$ENV{HOME}/projects/projects.list",
     LOG_EXTRA            => 1,
 

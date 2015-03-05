@@ -41,6 +41,10 @@ chown -R git:git /home/git
 
 cd /home/git && [ -d ./repositories ] && su git -c "
 
+  [ ! -f ./.ssh/known_hosts ] && [ \"\$TRUST_HOSTS\" ] && {
+    ssh-keyscan -H \$TRUST_HOSTS > .ssh/known_hosts
+  }
+
   [ -d ./repositories/gitolite-admin.git ] && {
     mv ./repositories/gitolite-admin.git ./repositories/gitolite-admin.git-tmp
   }
@@ -57,7 +61,10 @@ cd /home/git && [ -d ./repositories ] && su git -c "
     chmod 700 .gitolite/local/hooks/repo-specific
   }
 
-  cp /etc/gitolite.rc .gitolite.rc && rm projects.list
+  cp /etc/gitolite/gitolite.rc .gitolite.rc
+  cp /etc/gitolite/post-receive .gitolite/hooks/common/
+  rm -f projects.list
+
   cd ~/repositories/gitolite-admin.git && \
   GL_LIBDIR=/usr/share/gitolite3/lib hooks/post-update refs/heads/master
 

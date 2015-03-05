@@ -18,7 +18,9 @@ RUN yum update -y
 RUN rpm --import http://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7
 RUN yum install -y epel-release
 RUN yum install -y gitolite3 hostname openssh-server
-RUN adduser -m -G gitolite3 git
+RUN adduser -m -G gitolite3 git && \
+    mkdir /home/git/.ssh && \
+    chmod 700 /home/git/.ssh
 ADD rootfs /
 
 #------------------------------------------------------------------------------
