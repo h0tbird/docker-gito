@@ -10,6 +10,9 @@ cd docker-gito
 Install and run:
 ```
 sudo ln gito.service /etc/systemd/system/gito.service
+sudo ln bin/runctl /usr/local/sbin/runctl-gito
+sudo mkdir /etc/bootpaas
+sudo cp gito.conf /etc/bootpaas
 sudo systemctl daemon-reload
 sudo systemctl start gito
 ```
