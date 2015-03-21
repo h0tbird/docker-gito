@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Hard-link the systemd unit:
+ln -f gito.service /etc/systemd/system/gito.service
+ln -f bin/runctl /usr/local/sbin/runctl-gito
+
+# Populate config if not present:
+[ -d /etc/bootpaas ] || mkdir /etc/bootpaas
+[ ! -f /etc/bootpaas/gito.conf ] && cp gito.conf /etc/bootpaas/
+
+# Reload systemd:
+systemctl daemon-reload
