@@ -106,7 +106,7 @@ function run_pre {
 function run_start {
   exec $DOCKER run -t \
   --volume   ${DATA_DIR}/repos:/home/git/repositories \
-  --volume   $SSH_KEY:/home/git/.ssh/id_rsa \
+  --volume   ${SSH_KEY}:/home/git/.ssh/id_rsa \
   --hostname $HOSTNAME \
   --name     $ID \
   --net      none \
