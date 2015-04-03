@@ -11,9 +11,9 @@ MAINTAINER Marc Villacorta Morera <marc.villacorta@gmail.com>
 
 RUN rpm --import http://mirror.centos.org/centos/7/os/x86_64/RPM-GPG-KEY-CentOS-7
 RUN rpm --import http://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7
-RUN yum update -y
-RUN yum install -y epel-release
-RUN yum install -y gitolite3 hostname openssh-server
+RUN yum update -y && yum clean all
+RUN yum install -y epel-release && yum clean all
+RUN yum install -y gitolite3 hostname openssh-server && yum clean all
 RUN adduser -m -G gitolite3 git && \
     mkdir /home/git/.ssh && \
     chmod 700 /home/git/.ssh
