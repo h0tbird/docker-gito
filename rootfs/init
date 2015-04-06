@@ -29,13 +29,11 @@
 
 echo '[Init] Configuring the service...'
 
-[ -f /etc/ssh/ssh_host_rsa_key ] || {
-  ssh-keygen -q -f /etc/ssh/ssh_host_rsa_key -t rsa -N ''
-}
-
-[ -f /etc/ssh/ssh_host_ecdsa_key ] || {
-  ssh-keygen -q -f /etc/ssh/ssh_host_ecdsa_key -t ecdsa -N ''
-}
+for i in rsa ecdsa ed25519; do
+  echo "[Init] Generating ssh_host_${i}_key..."
+  [ -f /etc/ssh/ssh_host_${i}_key ] || \
+  ssh-keygen -q -f /etc/ssh/ssh_host_${i}_key -t $i -N ''
+done
 
 chown -R git:git /home/git
 

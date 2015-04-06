@@ -19,6 +19,7 @@ readonly BRCTL=`which brctl`
 [ -z "$HOSTNAME" ] && echo 'Ops! HOSTNAME is not set' && exit 99
 [ -z "$DATA_DIR" ] && echo 'Ops! DATA_DIR is not set' && exit 99
 [ -z "$SSH_KEY" ] && echo 'Ops! SSH_KEY is not set' && exit 99
+[ ! -f $SSH_KEY ] && echo 'Ops! SSH_KEY is not a file' && exit 99
 [ -z "$TRUST_HOSTS" ] && echo 'Ops! TRUST_HOSTS is not set' && exit 99
 
 #------------------------------------------------------------------------------
