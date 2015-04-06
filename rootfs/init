@@ -35,8 +35,6 @@ for i in rsa ecdsa ed25519; do
   ssh-keygen -q -f /etc/ssh/ssh_host_${i}_key -t $i -N ''
 done
 
-chown -R git:git /home/git
-
 cd /home/git && [ -d ./repositories ] && su git -c "
 
   [ ! -f ./.ssh/known_hosts ] && [ \"\$TRUST_HOSTS\" ] && {
