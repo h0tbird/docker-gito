@@ -1,0 +1,47 @@
+#!/bin/bash
+
+#------------------------------------------------------------------------------
+# Parse the command-line arguments:
+#------------------------------------------------------------------------------
+
+while [[ $# > 1 ]]; do
+
+  case $1 in
+
+    --owner)
+      OWNER="$2"
+      shift
+      ;;
+
+    --description)
+      DESCRIPTION="$2"
+      shift
+      ;;
+
+    --category)
+      CATEGORY="$2"
+      shift
+      ;;
+
+    --repo)
+      REPO="$2"
+      shift
+      ;;
+
+    *)
+      ;;
+
+  esac
+
+  shift
+
+done
+
+#------------------------------------------------------------------------------
+# Sanitize the input:
+#------------------------------------------------------------------------------
+
+echo "OWNER: $OWNER"
+echo "DESCRIPTION: $DESCRIPTION"
+echo "CATEGORY: $CATEGORY"
+echo "REPO: $REPO"
