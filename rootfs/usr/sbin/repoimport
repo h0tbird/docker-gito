@@ -37,6 +37,7 @@ while [[ $# > 1 ]]; do
 
     --repo)
       REPO="$2"
+      NAME=$(echo $REPO | rev | awk -F'[/.]' '{print $2}' | rev)
       shift
       ;;
 
@@ -56,11 +57,13 @@ done
 # Configuration template:
 #------------------------------------------------------------------------------
 
-CONF="repo puppet-config\n"
+CONF="repo ${NAME}\n"
 [ -z "$OWNER" ] || CONF="${CONF} config gitweb.owner = ${OWNER}\n"
 [ -z "$DESCR" ] || CONF="${CONF} config gitweb.description = ${DESCR}\n"
 [ -z "$CATEG" ] || CONF="${CONF} config gitweb.category = ${CATEG}\n"
 [ -z "$ADMIN" ] || CONF="${CONF} RW+ = ${ADMIN}\n"
+
+echo -e $CONF
 
 #------------------------------------------------------------------------------
 # Clone gitolite-admin:
