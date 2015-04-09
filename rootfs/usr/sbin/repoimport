@@ -61,14 +61,16 @@ done
 [ -d ~/.gitolite-admin.d ] || { mkdir ~/.gitolite-admin.d || exit 2; }
 [ -d ~/repositories/${NAME}.git ] && rm -rf ~/repositories/${NAME}.git
 [ -d ~/repositories/gitolite-admin.git ] || exit 3
+[ -f ~/.gitolite-admin.d/00_header.conf ] || \
+echo -e '##[ auto-generated ]##\n' > ~/.gitolite-admin.d/00_header.conf
 
 #------------------------------------------------------------------------------
 # Clone gitolite-admin and the imported repo:
 #------------------------------------------------------------------------------
 
-[ ! -d ~/gitolite-admin ] && \
-git clone ~/repositories/gitolite-admin.git ~/gitolite-admin || exit 4
-cd ~/repositories && git clone --bare $REPO || exit 5 
+[ ! -d ~/gitolite-admin ] && {
+git clone ~/repositories/gitolite-admin.git ~/gitolite-admin || exit 4; }
+cd ~/repositories && git clone --bare $REPO || exit 5
 
 #------------------------------------------------------------------------------
 # Generate the configuration:
@@ -82,4 +84,14 @@ CONF="repo ${NAME}\n"
 [ -z "$ADMIN" ] || CONF="${CONF} RW+ = ${ADMIN}"
 
 echo -e $CONF > ~/.gitolite-admin.d/${NAME}.conf || exit 6
-cat ~/.gitolite-admin.d/*.conf || exit 7
+awk '/auto-generated/{exit}1' ~/gitolite-admin/conf/gitolite.conf > /tmp/conf
+cat ~/.gitolite-admin.d/*.conf >> /tmp/conf
+cat /tmp/conf > ~/gitolite-admin/conf/gitolite.conf
+
+#------------------------------------------------------------------------------
+# Commit and push:
+#------------------------------------------------------------------------------
+
+cd ~/gitolite-admin
+git commit -am "Auto imported '${NAME}' repo"
+git push
