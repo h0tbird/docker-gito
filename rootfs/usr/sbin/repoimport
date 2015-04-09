@@ -11,7 +11,7 @@
 # Parse the command-line arguments:
 #------------------------------------------------------------------------------
 
-while [[ $# > 1 ]]; do
+while [ $# -gt 1 ]; do
 
   case $1 in
 
@@ -42,7 +42,7 @@ while [[ $# > 1 ]]; do
       ;;
 
     --mirror)
-      MIRRO="$2"
+      MIRRO=$(echo $REPO | sed 's/https:\/\//git@/;s/.com\//.com:/')
       ;;
 
     *) ;;
@@ -54,20 +54,32 @@ while [[ $# > 1 ]]; do
 done
 
 #------------------------------------------------------------------------------
-# Configuration template:
+# Validations and initializations:
+#------------------------------------------------------------------------------
+
+[ -z "$REPO" ] && echo 'You must provide a git repository' && exit 1
+[ -d ~/.gitolite-admin.d ] || { mkdir ~/.gitolite-admin.d || exit 2; }
+[ -d ~/repositories/${NAME}.git ] && rm -rf ~/repositories/${NAME}.git
+[ -d ~/repositories/gitolite-admin.git ] || exit 3
+
+#------------------------------------------------------------------------------
+# Clone gitolite-admin and the imported repo:
+#------------------------------------------------------------------------------
+
+[ ! -d ~/gitolite-admin ] && \
+git clone ~/repositories/gitolite-admin.git ~/gitolite-admin || exit 4
+cd ~/repositories && git clone --bare $REPO || exit 5 
+
+#------------------------------------------------------------------------------
+# Generate the configuration:
 #------------------------------------------------------------------------------
 
 CONF="repo ${NAME}\n"
 [ -z "$OWNER" ] || CONF="${CONF} config gitweb.owner = ${OWNER}\n"
 [ -z "$DESCR" ] || CONF="${CONF} config gitweb.description = ${DESCR}\n"
 [ -z "$CATEG" ] || CONF="${CONF} config gitweb.category = ${CATEG}\n"
-[ -z "$ADMIN" ] || CONF="${CONF} RW+ = ${ADMIN}\n"
+[ -z "$MIRRO" ] || CONF="${CONF} config gitolite.mirror.simple = ${MIRRO}\n"
+[ -z "$ADMIN" ] || CONF="${CONF} RW+ = ${ADMIN}"
 
-echo -e $CONF
-
-#------------------------------------------------------------------------------
-# Clone gitolite-admin:
-#------------------------------------------------------------------------------
-
-[ -d ~/gitolite-admin ] || \
-git clone ~/repositories/gitolite-admin.git ~/gitolite-admin
+echo -e $CONF > ~/.gitolite-admin.d/${NAME}.conf || exit 6
+cat ~/.gitolite-admin.d/*.conf || exit 7
