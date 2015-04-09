@@ -1,0 +1,6 @@
+[user]
+  name = Gitolite Server
+  email = gitolite@server.com
+
+[push]
+  default = simple

@@ -69,7 +69,7 @@ echo -e '##[ auto-generated ]##\n' > ~/.gitolite-admin.d/00_header.conf
 #------------------------------------------------------------------------------
 
 [ ! -d ~/gitolite-admin ] && {
-git clone ~/repositories/gitolite-admin.git ~/gitolite-admin || exit 4; }
+git clone git@localhost:gitolite-admin ~/gitolite-admin || exit 4; }
 cd ~/repositories && git clone --bare $REPO || exit 5
 
 #------------------------------------------------------------------------------
