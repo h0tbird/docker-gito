@@ -35,18 +35,21 @@ for i in rsa ecdsa ed25519; do
   ssh-keygen -q -f /etc/ssh/ssh_host_${i}_key -t $i -N ''
 done
 
-chown -R git:git /home/git/.ssh
+find /home/git \
+! -path /home/git/repositories \
+! -path /home/git/projects \
+-exec chown git:git {} \;
 
 cd /home/git && [ -d ./repositories ] && su git -c "
 
-  [ ! -f ./.ssh/known_hosts ] && [ \"\$TRUST_HOSTS\" ] && {
-    ssh-keyscan -H localhost > .ssh/known_hosts
-    ssh-keyscan -H \$TRUST_HOSTS >> .ssh/known_hosts
-  }
+  ssh-keyscan localhost 2> /dev/null >> .ssh/known_hosts
+  ssh-keyscan 127.0.0.1 2> /dev/null >> .ssh/known_hosts
 
-  [ -d ./repositories/gitolite-admin.git ] && {
-    mv ./repositories/gitolite-admin.git ./repositories/gitolite-admin.git-tmp
-  }
+  [ \"\$TRUST_HOSTS\" ] && \
+  ssh-keyscan \$TRUST_HOSTS 2> /dev/null >> .ssh/known_hosts
+
+  [ -d ./repositories/gitolite-admin.git ] && \
+  mv ./repositories/gitolite-admin.git ./repositories/gitolite-admin.git-tmp
 
   gitolite setup -a dummy &> /dev/null
 
