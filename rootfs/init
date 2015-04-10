@@ -36,14 +36,14 @@ for i in rsa ecdsa ed25519; do
 done
 
 find /home/git \
-! -path /home/git/repositories \
-! -path /home/git/projects \
+! -path "/home/git/repositories*" \
+! -path "/home/git/projects*" \
 -exec chown git:git {} \;
 
 cd /home/git && [ -d ./repositories ] && su git -c "
 
-  ssh-keyscan localhost 2> /dev/null >> .ssh/known_hosts
-  ssh-keyscan 127.0.0.1 2> /dev/null >> .ssh/known_hosts
+  cat /etc/ssh/ssh_host_rsa_key.pub | \
+  awk '{print \"localhost \"\$1\" \"\$2}' >> .ssh/known_hosts
 
   [ \"\$TRUST_HOSTS\" ] && \
   ssh-keyscan \$TRUST_HOSTS 2> /dev/null >> .ssh/known_hosts
