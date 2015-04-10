@@ -48,6 +48,9 @@ cd /home/git && [ -d ./repositories ] && su git -c "
   [ \"\$TRUST_HOSTS\" ] && \
   ssh-keyscan \$TRUST_HOSTS 2> /dev/null >> .ssh/known_hosts
 
+  [ -f .ssh/id_rsa.pub ] && \
+  cat .ssh/id_rsa.pub >> .ssh/authorized_keys
+
   [ -d ./repositories/gitolite-admin.git ] && \
   mv ./repositories/gitolite-admin.git ./repositories/gitolite-admin.git-tmp
 
