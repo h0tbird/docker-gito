@@ -56,7 +56,7 @@ cd /home/git && [ -d ./repositories ] && su git -c "
   }
 
   echo '[Init] Running gitolite setup...'
-  ln .ssh/id_rsa.pub admin.pub
+  cp .ssh/id_rsa.pub admin.pub
   gitolite setup -pk admin.pub &> /dev/null
   rm -f admin.pub
 
