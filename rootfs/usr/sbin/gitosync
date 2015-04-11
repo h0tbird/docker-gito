@@ -62,7 +62,7 @@ done
 [ -d ~/repositories/${NAME}.git ] && rm -rf ~/repositories/${NAME}.git
 [ -d ~/repositories/gitolite-admin.git ] || exit 3
 [ -f ~/.gitolite-admin.d/00_header.conf ] || \
-echo -e '##[ auto-generated ]##\n' > ~/.gitolite-admin.d/00_header.conf
+echo -e "#[ auto-generated $(date) ]#\n" > ~/.gitolite-admin.d/00_header.conf
 
 #------------------------------------------------------------------------------
 # Clone gitolite-admin and the imported repo:
@@ -93,5 +93,6 @@ cat /tmp/conf > ~/gitolite-admin/conf/gitolite.conf
 #------------------------------------------------------------------------------
 
 cd ~/gitolite-admin
+git pull
 git commit -am "Auto imported '${NAME}' repo"
 git push
