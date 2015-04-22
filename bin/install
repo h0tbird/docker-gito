@@ -1,12 +1,80 @@
 #!/bin/bash
+#
+# Installs the Booddies 'gito' service.
 
-# Hard-link the systemd unit:
-ln -f gito.service /etc/systemd/system/gito.service
-ln -f bin/runctl /usr/local/sbin/runctl-gito
+#------------------------------------------------------------------------------
+# Globals:
+#------------------------------------------------------------------------------
 
-# Populate config if not present:
-[ -d /etc/booddies ] || mkdir /etc/booddies
-[ ! -f /etc/booddies/gito.conf ] && cp gito.conf /etc/booddies/
+E_BAD_LN=1
+E_BAD_MKDIR=1
+E_BAD_CP=1
 
-# Reload systemd:
-systemctl daemon-reload
+#------------------------------------------------------------------------------
+# Source miscellaneous bash functions:
+#------------------------------------------------------------------------------
+
+source ../../bin/misclib.sh
+
+#------------------------------------------------------------------------------
+# Install /etc/systemd/system/gito.service
+#------------------------------------------------------------------------------
+
+target='gito.service'
+link_name='/etc/systemd/system/gito.service'
+msg="Install ${link_name}"
+
+misc::stat_busy "${msg}"
+
+if ! ln -f "${target}" "${link_name}"; then
+  misc::log "[ERROR] ${msg}"
+  misc::stat_fail
+  exit "${E_BAD_LN}"
+else
+  misc::stat_done
+fi
+
+#------------------------------------------------------------------------------
+# Install /usr/local/sbin/runctl-gito
+#------------------------------------------------------------------------------
+
+target='bin/runctl'
+link_name='/usr/local/sbin/runctl-gito'
+msg="Install ${link_name}"
+
+misc::stat_busy "${msg}"
+
+if ! ln -f "${target}" "${link_name}"; then
+  misc::log "[ERROR] ${msg}"
+  misc::stat_fail
+  exit "${E_BAD_LN}"
+else
+  misc::stat_done
+fi
+
+#------------------------------------------------------------------------------
+# Install /etc/booddies/gito.conf
+#------------------------------------------------------------------------------
+
+msg1='Create /etc/booddies directory'
+msg2='Install /etc/booddies/gito.conf'
+
+misc::stat_busy "${msg2}"
+
+if [[ ! -d /etc/booddies ]]; then
+  if ! mkdir /etc/booddies; then
+    misc::log "[ERROR] ${msg1}"
+    misc::stat_fail
+    exit "${E_BAD_MKDIR}"
+  fi
+fi
+
+if [[ ! -f /etc/booddies/gito.conf ]]; then
+  if ! cp gito.conf /etc/booddies/; then
+    misc::log "[ERROR] ${msg2}"
+    misc::stat_fail
+    exit "${E_BAD_CP}"
+  fi
+else
+  misc::stat_done
+fi
