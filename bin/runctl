@@ -97,11 +97,11 @@ function run_pre() {
   local MSG3="[Pre] OK! The image '${IMAGE}' is up to date"
   local MSG4="[Pre] Ops! Failed to download the image '${IMAGE}'"
   local MSG5="[Pre] OK! The image '${IMAGE}' already exists"
-  (! $CMD_DOCKER images | grep -q $IMAGE); COND1=$?
-  $CMD_DOCKER images | grep $IMAGE | grep -q latest; COND2=$?
-  echo $MSG1; [[ "$COND1" -eq 0 || "$COND2" -eq 0 ]] && {
-  echo $MSG2; $CMD_DOCKER pull $IMAGE &> /dev/null && echo $MSG3 || {
-  echo $MSG4; exit 6; } } || echo $MSG5
+  (! ${CMD_DOCKER} images | grep -q ${IMAGE}); COND1=$?
+  ${CMD_DOCKER} images | grep ${IMAGE} | grep -q latest; COND2=$?
+  echo ${MSG1}; [[ "${COND1}" -eq 0 || "${COND2}" -eq 0 ]] && {
+  echo ${MSG2}; ${CMD_DOCKER} pull ${IMAGE} &> /dev/null && echo ${MSG3} || {
+  echo ${MSG4}; exit 6; } } || echo ${MSG5}
 }
 
 #------------------------------------------------------------------------------
@@ -118,14 +118,14 @@ function run_start() {
   --net      none \
   --env      WAIT_NETWORK=true \
   --env      TRUST_HOSTS="${TRUST_HOSTS}" \
-  $IMAGE
+  ${IMAGE}
 }
 
 #------------------------------------------------------------------------------
 # Function to be called by ExecStartPost:
 #------------------------------------------------------------------------------
 
-function run_post {
+function run_post() {
 
   # Wait for the container to become accessible:
   local MSG1="[Post] Waiting for the '${ID}' container to become accessible..."
@@ -189,8 +189,11 @@ function run_post {
   local MSG2="[Post] OK! The DHCP client returned successfully"
   local MSG3="[Post] Ops! The DHCP client returned a non-zero value"
   [ -f /run/dhcpcd-eth1* ] && rm -f /run/dhcpcd-eth1*
+  [ -f /var/lib/dhcpcd/dhcpcd-eth1* ] && rm -f /var/lib/dhcpcd/dhcpcd-eth1*
   echo ${MSG1}; ${CMD_IP} netns exec ${PID} dhcpcd -4 -A -c /bin/true -q eth1 -h ${ID} && \
   echo ${MSG2} || { echo ${MSG3}; exit 8; }
+  [ -f /run/dhcpcd-eth1* ] && rm -f /run/dhcpcd-eth1*
+  [ -f /var/lib/dhcpcd/dhcpcd-eth1* ] && rm -f /var/lib/dhcpcd/dhcpcd-eth1*
 }
 
 #------------------------------------------------------------------------------
