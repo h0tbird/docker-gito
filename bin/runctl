@@ -32,8 +32,6 @@ source /etc/booddies/gito.conf || exit ${E_BAD_CONF}
 [ -z "${DATA_DIR}" ] && echo 'Ops! DATA_DIR is not set' && exit ${E_BAD_CONF}
 [ -z "${SSH_PRI_KEY}" ] && echo 'Ops! SSH_PRI_KEY is not set' && exit ${E_BAD_CONF}
 [ -z "${SSH_PUB_KEY}" ] && echo 'Ops! SSH_PUB_KEY is not set' && exit ${E_BAD_CONF}
-[ ! -f ${SSH_PRI_KEY} ] && echo 'Ops! SSH_PRI_KEY is not a file' && exit ${E_BAD_CONF}
-[ ! -f ${SSH_PUB_KEY} ] && echo 'Ops! SSH_PUB_KEY is not a file' && exit ${E_BAD_CONF}
 [ -z "${TRUST_HOSTS}" ] && echo 'Ops! TRUST_HOSTS is not set' && exit ${E_BAD_CONF}
 [ -z "${HOST_BRIDGE}" ] && echo 'Ops! HOST_BRIDGE is not set' && exit ${E_BAD_CONF}
 
@@ -44,6 +42,20 @@ source /etc/booddies/gito.conf || exit ${E_BAD_CONF}
 function genmac() {
   echo "${HOSTNAME}" | ${CMD_MD5SUM} | \
   ${CMD_HEXDUMP} -n3 -e "/3 \"${OUI}\" 3/1 \":%02X\""
+}
+
+function ssh_key() {
+
+  case $1 in
+
+    'pub') [[ -n "${SSH_PUB_KEY}" && ! -f "${SSH_PUB_KEY}" ]] && \
+           echo 'Ops! SSH_PUB_KEY is not a file' && exit ${E_BAD_CONF}
+           echo -n "--volume ${SSH_PUB_KEY}:/home/git/.ssh/id_rsa.pub" ;;
+
+    'pri') [[ -n "${SSH_PRI_KEY}" && ! -f "${SSH_PRI_KEY}" ]] && \
+           echo 'Ops! SSH_PRI_KEY is not a file' && exit ${E_BAD_CONF}
+           echo -n "--volume ${SSH_PRI_KEY}:/home/git/.ssh/id_rsa" ;;
+  esac
 }
 
 #------------------------------------------------------------------------------
@@ -114,9 +126,9 @@ function run_pre() {
 
 function run_start() {
   exec ${CMD_DOCKER} run -t \
+  $(ssh_key pub) \
+  $(ssh_key pri) \
   --volume   ${DATA_DIR}/repos:/home/git/repositories \
-  --volume   ${SSH_PRI_KEY}:/home/git/.ssh/id_rsa \
-  --volume   ${SSH_PUB_KEY}:/home/git/.ssh/id_rsa.pub \
   --hostname "${HOSTNAME}" \
   --name     "${ID}" \
   --net      none \
