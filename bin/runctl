@@ -48,12 +48,10 @@ function ssh_key() {
 
   case $1 in
 
-    'pub') [[ -n "${SSH_PUB_KEY}" && ! -f "${SSH_PUB_KEY}" ]] && \
-           echo 'Ops! SSH_PUB_KEY is not a file' && exit ${E_BAD_CONF}
+    'pub') [ -f "${SSH_PUB_KEY}" ] || return
            echo -n "--volume ${SSH_PUB_KEY}:/home/git/.ssh/id_rsa.pub" ;;
 
-    'pri') [[ -n "${SSH_PRI_KEY}" && ! -f "${SSH_PRI_KEY}" ]] && \
-           echo 'Ops! SSH_PRI_KEY is not a file' && exit ${E_BAD_CONF}
+    'pri') [ -f "${SSH_PRI_KEY}" ] || return
            echo -n "--volume ${SSH_PRI_KEY}:/home/git/.ssh/id_rsa" ;;
   esac
 }
