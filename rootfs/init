@@ -59,7 +59,7 @@ cd /home/git && [ -d ./repositories ] && su git -c "
   echo '[Init] Running gitolite setup...'
 
   [ -f ~/.ssh/id_rsa.pub ] && cp ~/.ssh/id_rsa.pub admin.pub || {
-    sh-keygen -f ~/.ssh/dyn_rsa -t rsa -N ''
+    ssh-keygen -f ~/.ssh/dyn_rsa -t rsa -N ''
     cp ~/.ssh/dyn_rsa.pub admin.pub
   }
 
