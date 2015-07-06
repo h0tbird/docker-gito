@@ -30,7 +30,7 @@
 for i in rsa ecdsa ed25519; do
   echo "[Init] Generating ssh_host_${i}_key..."
   [ -f /etc/ssh/ssh_host_${i}_key ] || \
-  ssh-keygen -q -f /etc/ssh/ssh_host_${i}_key -t $i -N ''
+  ssh-keygen -q -f /etc/ssh/ssh_host_${i}_key -t ${i} -N ''
 done
 
 echo '[Init] Setting /home/git ownership...'
@@ -46,17 +46,15 @@ cd /home/git && [ -d ./repositories ] && su git -c "
   cat /etc/ssh/ssh_host_rsa_key.pub | \
   awk '{print \"localhost \"\$1\" \"\$2}' >> .ssh/known_hosts
 
-  [ \"\$TRUST_HOSTS\" ] && {
-    echo \"[Init] Gathering \$TRUST_HOSTS ssh public key...\"
-    ssh-keyscan \$TRUST_HOSTS 2> /dev/null >> .ssh/known_hosts
+  [ \"\${TRUST_HOSTS}\" ] && {
+    echo \"[Init] Gathering \${TRUST_HOSTS} ssh public key...\"
+    ssh-keyscan \${TRUST_HOSTS} >> .ssh/known_hosts
   }
 
   [ -d ./repositories/gitolite-admin.git ] && {
     echo '[Init] Protecting existing gitolite-admin repo...'
     mv ./repositories/gitolite-admin.git ./repositories/gitolite-admin.git-tmp
   }
-
-  echo '[Init] Running gitolite setup...'
 
   [ -f ~/.ssh/id_rsa.pub ] && cp ~/.ssh/id_rsa.pub admin.pub || {
     ssh-keygen -f ~/.ssh/dyn_rsa -t rsa -N ''
@@ -65,7 +63,8 @@ cd /home/git && [ -d ./repositories ] && su git -c "
 
   [ -f ~/.ssh/id_rsa ] || cp ~/.ssh/dyn_rsa ~/.ssh/id_rsa
 
-  gitolite setup -pk admin.pub &> /dev/null
+  echo '[Init] Running gitolite setup...'
+  gitolite setup -pk admin.pub
   rm -f admin.pub
 
   [ -d ./repositories/gitolite-admin.git-tmp ] && {
