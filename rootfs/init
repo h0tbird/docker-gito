@@ -48,7 +48,7 @@ cd /home/git && [ -d ./repositories ] && su git -c "
 
   [ \"\${TRUST_HOSTS}\" ] && {
     echo \"[Init] Gathering \${TRUST_HOSTS} ssh public key...\"
-    ssh-keyscan \${TRUST_HOSTS} >> .ssh/known_hosts
+    ssh-keyscan -t rsa \${TRUST_HOSTS} >> .ssh/known_hosts
   }
 
   [ -d ./repositories/gitolite-admin.git ] && {
