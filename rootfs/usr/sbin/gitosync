@@ -4,9 +4,19 @@
 # Run as 'git' user:
 #------------------------------------------------------------------------------
 
-[ $EUID -ne $(id -u git) ] && exec su git -c \
+[ ${EUID} -ne $(id -u git) ] && exec su git -c \
 "${0} '${1}' '${2}' '${3}' '${4}' '${5}' '${6}' '${7}' '${8}' '${9}' \
 '${10}' '${11}' '${12}' '${13}' '${14}'"
+
+#------------------------------------------------------------------------------
+# Globals:
+#------------------------------------------------------------------------------
+
+# Return codes:
+readonly E_BAD_CMD=10
+readonly E_BAD_CONF=11
+readonly E_BAD_DIR=12
+readonly E_BAD_CLONE=13
 
 #------------------------------------------------------------------------------
 # Parse the command-line arguments:
@@ -43,7 +53,7 @@ while [ $# -gt 1 ]; do
 
     --mirror)
       [ "$2" == "true" ] && \
-      MIRRO=$(echo $REPO | sed 's/https:\/\//git@/;s/.com\//.com:/')
+      MIRRO=$(echo ${REPO} | sed 's/https:\/\//git@/;s/.com\//.com:/')
       shift
       ;;
 
@@ -64,42 +74,65 @@ done
 # Validations and initializations:
 #------------------------------------------------------------------------------
 
-[ -z "$REPO" ] && echo 'You must provide a git repository' && exit 1
-[ -z "$NAME" ] && NAME=$(echo $REPO | rev | awk -F'[/.]' '{print $2}' | rev)
-[ -d ~/.gitolite-admin.d ] || { mkdir ~/.gitolite-admin.d || exit 2; }
-[ -d ~/repositories/${NAME}.git ] && rm -rf ~/repositories/${NAME}.git
-[ -d ~/repositories/gitolite-admin.git ] || exit 3
-echo -e "#[ auto-generated $(date) ]#\n" > ~/.gitolite-admin.d/00_header.conf
+[ -z "${REPO}" ] && echo 'You must provide a git repository' && exit ${E_BAD_CONF}
+[ -z "${NAME}" ] && NAME=$(echo ${REPO} | rev | awk -F'[/.]' '{print $2}' | rev)
+
+#------------------------------------------------------------------------------
+# If REPO already exist then fetch origin:
+#------------------------------------------------------------------------------
+
+[ -d ${HOME}/repositories/${NAME}.git ] && {
+
+  cd ${HOME}/repositories/${NAME}.git
+  git fetch origin '+*:*'
+
+} && return 0
+
+#------------------------------------------------------------------------------
+# If REPO does not exist:
+#------------------------------------------------------------------------------
+
+[ -d ${HOME}/.gitolite-admin.d ] || {
+  mkdir ${HOME}/.gitolite-admin.d || \
+  exit ${E_BAD_DIR}
+}
+
+[ -d ${HOME}/repositories/gitolite-admin.git ] || exit ${E_BAD_DIR}
+echo -e "#[ auto-generated $(date) ]#\n" > ${HOME}/.gitolite-admin.d/00_header.conf
 
 #------------------------------------------------------------------------------
 # Clone gitolite-admin and the imported repo:
 #------------------------------------------------------------------------------
 
-[ ! -d ~/gitolite-admin ] && {
-git clone git@localhost:gitolite-admin ~/gitolite-admin || exit 4; }
-cd ~/repositories && git clone --bare $REPO ${NAME}.git || exit 5
+[ ! -d ${HOME}/gitolite-admin ] && {
+  git clone git@localhost:gitolite-admin ${HOME}/gitolite-admin || \
+  exit ${E_BAD_CLONE}
+}
+
+cd ${HOME}/repositories && git clone --bare ${REPO} ${NAME}.git || \
+exit ${E_BAD_CLONE}
 
 #------------------------------------------------------------------------------
 # Generate the configuration:
 #------------------------------------------------------------------------------
 
 CONF="repo ${NAME}\n"
-[ -z "$OWNER" ] || CONF="${CONF} config gitweb.owner = ${OWNER}\n"
-[ -z "$DESCR" ] || CONF="${CONF} config gitweb.description = ${DESCR}\n"
-[ -z "$CATEG" ] || CONF="${CONF} config gitweb.category = ${CATEG}\n"
-[ -z "$MIRRO" ] || CONF="${CONF} config gitolite.mirror.simple = ${MIRRO}\n"
-[ -z "$ADMIN" ] || CONF="${CONF} RW+ = ${ADMIN}"
+[ -z "${OWNER}" ] || CONF="${CONF} config gitweb.owner = ${OWNER}\n"
+[ -z "${DESCR}" ] || CONF="${CONF} config gitweb.description = ${DESCR}\n"
+[ -z "${CATEG}" ] || CONF="${CONF} config gitweb.category = ${CATEG}\n"
+[ -z "${MIRRO}" ] || CONF="${CONF} config gitolite.mirror.simple = ${MIRRO}\n"
+[ -z "${ADMIN}" ] || CONF="${CONF} RW+ = ${ADMIN}"
 
-echo -e $CONF > ~/.gitolite-admin.d/${NAME}.conf || exit 6
-awk '/auto-generated/{exit}1' ~/gitolite-admin/conf/gitolite.conf > /tmp/conf
-cat ~/.gitolite-admin.d/*.conf >> /tmp/conf
-cat /tmp/conf > ~/gitolite-admin/conf/gitolite.conf
+echo -e ${CONF} > ${HOME}/.gitolite-admin.d/${NAME}.conf || exit ${E_BAD_CONF}
+awk '/auto-generated/{exit}1' ${HOME}/gitolite-admin/conf/gitolite.conf > /tmp/conf
+cat ${HOME}/.gitolite-admin.d/*.conf >> /tmp/conf
+cat /tmp/conf > ${HOME}/gitolite-admin/conf/gitolite.conf
 
 #------------------------------------------------------------------------------
 # Commit and push:
 #------------------------------------------------------------------------------
 
-cd ~/gitolite-admin
+cd ${HOME}/gitolite-admin
 git pull
 git commit -am "Auto imported '${NAME}' repo"
 git push
