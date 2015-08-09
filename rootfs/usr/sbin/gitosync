@@ -86,7 +86,7 @@ done
   cd ${HOME}/repositories/${NAME}.git
   git fetch origin '+*:*'
 
-} && return 0
+} && exit 0
 
 #------------------------------------------------------------------------------
 # If REPO does not exist:
