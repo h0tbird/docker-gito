@@ -1,5 +1,8 @@
 # docker-gito
 
+[![Build Status](https://travis-ci.org/h0tbird/docker-gito.svg?branch=master)](https://travis-ci.org/h0tbird/docker-gito)
+[![](https://badge.imagelayers.io/h0tbird/gito:latest.svg)](https://imagelayers.io/?images=h0tbird/gito:latest 'Get your own badge on imagelayers.io')
+
 This container is member of the [*booddies*](https://github.com/h0tbird/booddies) fellowship.
 
 Clone and build:
